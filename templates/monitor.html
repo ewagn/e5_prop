@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monitoring</title>
+    <!-- Inclure les bibliothèques nécessaires, par exemple Plotly pour les graphiques -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Monitoring Dashboard</h1>
+
+    <div>
+        <h2>Temps de réponse des requêtes</h2>
+        <p>Ce graphique montre le temps de réponse des requêtes au fil du temps. Un temps de réponse élevé peut indiquer des problèmes de performance.</p>
+        <div id="responseTimeGraph"></div>
+    </div>
+
+    <div>
+        <h2>Requêtes par seconde (RPS)</h2>
+        <p>Ce graphique montre le nombre de requêtes reçues par seconde. Une augmentation soudaine des RPS peut indiquer un pic de trafic ou une attaque.</p>
+        <div id="rpsGraph"></div>
+    </div>
+
+    <div>
+        <h2>Erreurs HTTP</h2>
+        <p>Ce graphique montre le nombre d'erreurs HTTP (4xx et 5xx) au fil du temps. Un nombre élevé d'erreurs HTTP peut indiquer des problèmes avec l'application ou les utilisateurs.</p>
+        <div id="httpErrorGraph"></div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $.getJSON('/monitoring-data', function(data) {
+                // Temps de réponse des requêtes
+                Plotly.newPlot('responseTimeGraph', [{
+                    x: data.response_time_data.timestamps,
+                    y: data.response_time_data.response_times,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Temps de réponse'
+                }], {
+                    title: 'Temps de réponse des requêtes',
+                    xaxis: { title: 'Temps' },
+                    yaxis: { title: 'Temps de réponse (s)' }
+                });
+
+                // Requêtes par seconde (RPS)
+                Plotly.newPlot('rpsGraph', [{
+                    x: data.rps_data.timestamps,
+                    y: data.rps_data.requests_per_second,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Requêtes par seconde'
+                }], {
+                    title: 'Requêtes par seconde',
+                    xaxis: { title: 'Temps' },
+                    yaxis: { title: 'Requêtes par seconde (RPS)' }
+                });
+
+                // Erreurs HTTP
+                Plotly.newPlot('httpErrorGraph', [{
+                    x: data.http_error_data.timestamps,
+                    y: data.http_error_data.error_counts,
+                    type: 'bar',
+                    name: 'Erreurs HTTP'
+                }], {
+                    title: 'Erreurs HTTP (4xx et 5xx)',
+                    xaxis: { title: 'Temps' },
+                    yaxis: { title: 'Nombre d\'erreurs' }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
